@@ -1,0 +1,15 @@
+package com.example.newspaperapp.mappers;
+
+import com.example.newspaperapp.dtos.journalist.JournalistDto;
+import com.example.newspaperapp.entities.Journalist;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
+
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+public interface JournalistMapper {
+    
+    JournalistDto toDto(Journalist journalist);
+
+    Journalist toEntity(JournalistDto journalistDto);
+}

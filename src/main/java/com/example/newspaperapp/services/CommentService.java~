@@ -1,0 +1,15 @@
+package com.example.newspaperapp.services;
+
+import com.example.newspaperapp.dtos.comment.CommentDto;
+import com.example.newspaperapp.dtos.comment.CreateCommentRequest;
+import com.example.newspaperapp.dtos.comment.UpdateCommentRequest;
+
+import java.util.List;
+
+public interface CommentService {
+    List<CommentDto> findAllByArticle(Long articleId);
+    CommentDto create(CreateCommentRequest request);
+    CommentDto update(long id, UpdateCommentRequest request);
+    void delete(Long id);
+
+}

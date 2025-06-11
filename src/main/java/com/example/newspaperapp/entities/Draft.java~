@@ -1,0 +1,40 @@
+package com.example.newspaperapp.entities;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.Instant;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity(name = "drafts")
+public class Draft {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Size(max = 100)
+    @NotNull
+    @Column(name = "title", nullable = false,length = 100)
+    private String title;
+
+    @Size(min = 50 , max = 5000)
+    @NotNull
+    @Column(name = "content", nullable = false, length = 5000)
+    private String content;
+
+    private boolean isAutoSaved;
+    private Instant lastEdited;
+
+    @ManyToOne
+    @JoinColumn(name = "journalist_id")
+    private Journalist journalist;
+}

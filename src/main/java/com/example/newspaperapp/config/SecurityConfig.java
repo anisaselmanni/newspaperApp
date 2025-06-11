@@ -1,0 +1,105 @@
+package com.example.newspaperapp.config;
+
+import com.example.newspaperapp.entities.User;
+import com.example.newspaperapp.repositories.UserRepository;
+import com.example.newspaperapp.security.AppUserDetailsService;
+import com.example.newspaperapp.security.JwtAuthenticationFilter;
+import com.example.newspaperapp.services.AuthenticationService;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import static com.example.newspaperapp.entities.Permission.*;
+import static com.example.newspaperapp.entities.Role.ADMIN;
+import static com.example.newspaperapp.entities.Role.JOURNALIST;
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+    @Bean
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter(AuthenticationService authenticationService) {
+        return new JwtAuthenticationFilter(authenticationService);
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+        http.authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/articles/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/comments/**").permitAll()
+
+
+                        .requestMatchers("/api/v1/journalistic/**").hasAnyRole(ADMIN.name(), JOURNALIST.name())
+
+                        .requestMatchers(HttpMethod.GET, "/api/v1/journalistic/**")
+                            .hasAnyAuthority(ADMIN_READ.name(), JOURNALIST_READ.name())
+                        .requestMatchers(HttpMethod.POST, "/api/v1/journalistic/**")
+                            .hasAnyAuthority(ADMIN_WRITE.name(), JOURNALIST_WRITE.name())
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/journalistic/**")
+                            .hasAnyAuthority(ADMIN_WRITE.name(), JOURNALIST_WRITE.name())
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/journalistic/**")
+                            .hasAnyAuthority(ADMIN_WRITE.name(), JOURNALIST_WRITE.name())
+
+                        .requestMatchers("/api/v1/admin/**").hasRole(ADMIN.name())
+
+//                        .requestMatchers(HttpMethod.GET, "/api/v1/admin/**").hasAuthority(ADMIN_READ.name())
+//                        .requestMatchers(HttpMethod.POST, "/api/v1/admin/**").hasAuthority(ADMIN_WRITE.name())
+//                        .requestMatchers(HttpMethod.PUT, "/api/v1/admin/**").hasAuthority(ADMIN_WRITE.name())
+//                        .requestMatchers(HttpMethod.DELETE, "/api/v1/admin/**").hasAuthority(ADMIN_WRITE.name())
+                        .anyRequest().authenticated()
+                )
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> {})
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // JWT per ate e perdorim auth Stateless edhe e bejme disable CSRF
+
+        return http.build();
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService(UserRepository userRepository) {
+        AppUserDetailsService appUserDetailsService = new AppUserDetailsService(userRepository);
+
+        String email = "user@test.com";
+        userRepository.findByEmail(email)
+                .orElseGet(() -> {
+                    var user = User.builder()
+                            .name("Anisa")
+                            .surname("Selmani")
+                            .email(email)
+                            .role(ADMIN)
+                            .isActive(true)
+                            .password(passwordEncoder().encode("password"))
+                            .build();
+
+                    return userRepository.save(user);
+                });
+
+        return appUserDetailsService;
+    }
+}
