@@ -28,7 +28,7 @@ public class CommentServiceImpl implements CommentService {
         if (articleId != null) {
             var articleDto = articleService.findById(articleId);
             var article = articleMapper.toEntity(articleDto);
-            return repository.findAllByArticleId(articleId)
+            return repository.findAllByArticle(article)
                     .stream()
                     .map(commentMapper::toDto)
                     .toList();

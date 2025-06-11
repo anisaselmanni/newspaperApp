@@ -19,9 +19,9 @@ import java.util.List;
 public class CommentController {
     private final CommentService service;
 
-    @GetMapping
-    public ResponseEntity<List<CommentDto>> findAllByArticleId(@PathVariable Long articleId) {
-        return ResponseEntity.ok(service.findAllByArticleId(articleId));
+    @GetMapping("article/{id}")
+    public ResponseEntity<List<CommentDto>> findAllByArticleId(@PathVariable Long id) {
+        return ResponseEntity.ok(service.findAllByArticleId(id));
     }
 
     @PostMapping
