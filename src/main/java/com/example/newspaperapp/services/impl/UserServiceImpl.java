@@ -5,6 +5,7 @@ import com.example.newspaperapp.dtos.user.UpdateUserRequest;
 import com.example.newspaperapp.dtos.user.UserDto;
 import com.example.newspaperapp.entities.User;
 import com.example.newspaperapp.exceptions.UserNotFoundException;
+import com.example.newspaperapp.mappers.UserMapper;
 import com.example.newspaperapp.repositories.UserRepository;
 import com.example.newspaperapp.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository repository;
+    private final UserMapper mapper;
 
     @Override
     public List<UserDto> findAll() {
@@ -36,9 +38,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto create(CreateUserRequest request) {
-        var userToCreate = new User(Long.valueOf(0),request.getName(), request.getSurname(), request.getEmail(),request.getPassword(), request.getRole(),request.getIsActive(),request.getCreatedBy(),request.getCreatedAt(),request.getJournalist(),new ArrayList<>(),request.getUpdatedAt());
+        var userToCreate = new User(0L,request.getName(), request.getSurname(), request.getEmail(),request.getPassword(), request.getRole(),request.getIsActive(),request.getCreatedBy(),request.getCreatedAt(),request.getJournalist(),new ArrayList<>(),request.getUpdatedAt());
         var createdUser = repository.save(userToCreate);
-        return new UserDto(createdUser.getName(), createdUser.getSurname(), createdUser.getEmail(), createdUser.getRole(),createdUser.getIsActive(),createdUser.getCreatedBy(),createdUser.getCreatedAt());
+        return mapper.toDto(createdUser);
     }
 
     @Override
@@ -52,7 +54,7 @@ public class UserServiceImpl implements UserService {
         userFromDb.setRole(request.getRole());
         userFromDb.setUpdatedAt(Instant.now());
         var updatedUser = repository.save(userFromDb);
-        return new UserDto(updatedUser.getName(), updatedUser.getSurname(), updatedUser.getEmail(), updatedUser.getRole(),updatedUser.getIsActive(),updatedUser.getCreatedBy(),updatedUser.getCreatedAt());
+        return mapper.toDto(updatedUser);
     }
 
     @Override

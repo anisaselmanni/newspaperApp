@@ -4,6 +4,7 @@ import com.example.newspaperapp.dtos.article.ArticleDto;
 import com.example.newspaperapp.dtos.article.CreateArticleRequest;
 import com.example.newspaperapp.dtos.article.UpdateArticleRequest;
 
+
 import java.util.List;
 
 public interface ArticleService {

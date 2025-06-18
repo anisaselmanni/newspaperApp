@@ -12,6 +12,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ArticleDto {
+    private Long id;
     private String title;
     private String content;
     private Category category;

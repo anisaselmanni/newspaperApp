@@ -19,9 +19,8 @@ public class Journalist {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @OneToOne()
     @JoinColumn(name = "user_id", referencedColumnName = "id", unique = true, nullable = false)
-
     private User user;
 
     @Size(max = 100)
@@ -37,11 +36,6 @@ public class Journalist {
     @Size(max = 500)
     @Column(name = "bio", length = 500)
     private String bio;
-
-    @Size(max = 255)
-    @NotNull
-    @Column(name = "email", nullable = false, unique = true)
-    private String email;
 
     @Size(max = 255)
     @NotNull

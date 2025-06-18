@@ -8,5 +8,6 @@ public enum Category {
     BUSINESS,
     HEALTH,
     WEATHER,
-    WORLD
+    WORLD,
+    TRENDING
 }
